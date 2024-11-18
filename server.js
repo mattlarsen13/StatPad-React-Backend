@@ -86,6 +86,7 @@ app.get("/api/players", (req, res)=>{
     res.json(players);
 });
 
+
 app.post("/api/players", upload.single("img"), (req, res) => {
     const result = validatePlayer(req.body);
 

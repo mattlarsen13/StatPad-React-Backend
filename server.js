@@ -120,7 +120,7 @@ const validatePlayer = (players) => {
     return schema.validate(players);
 };
 
-app.listen(3000, () => {
+app.listen(3001, () => {
     console.log("Listening...");
 });
 

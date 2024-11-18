@@ -8,7 +8,7 @@ const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(bull, "./public/images/");
+        cb(null, "./public/images/");
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname);
@@ -79,7 +79,7 @@ const players = [
 
 app.get("/",(req, res)=>{
     console.log("getting me");
-    res.sendFile(_dirname + "/index.html");
+    res.sendFile(__dirname + "/index.html");
 });
 
 app.get("/api/players", (req, res)=>{
@@ -95,14 +95,14 @@ app.post("/api/players", upload.single("img"), (req, res) => {
     }
 
     const player = {
-        _id: _id.length +1,
+        _id: players.length +1,
         name: req.body.name,
         imagelink: req.body.imagelink,
         description: req.body.description,
     };
 
     if (req.file) {
-        house.image = "images/" + req.file.filename;
+        player.image = "images/" + req.file.filename;
     }
 
     players.push(player);

@@ -6,6 +6,16 @@ app.use(express.static("public"));
 const Joi = require('joi');
 const multer = require('multer');
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(bull, "./public/images/");
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    },
+});
+
+const upload = multer({ storage: storage });
 
 
 const players = [

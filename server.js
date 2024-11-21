@@ -110,6 +110,20 @@ app.post("/api/players", upload.single("img"), (req, res) => {
     res.status(200).send(player);
 });
 
+app.delete("/api/players/:id", (req, res)=> {
+    const id = ParseInt(req.params.id);
+    const player = players.find((player) => player._id === id);
+
+    if(!player) {
+        res.status(404).send("The player with provided ID was not found.");
+        return;
+    }
+
+    const index = players.indexOf(player);
+    players.splice(index,1);
+    res.status(200).send(player);
+});
+
 const validatePlayer = (players) => {
     const schema = Joi.object({
         _id: Joi.allow(""),

@@ -111,7 +111,7 @@ app.post("/api/players", upload.single("img"), (req, res) => {
 });
 
 app.delete("/api/players/:id", (req, res)=> {
-    const id = ParseInt(req.params.id);
+    const id = parseInt(req.params.id);
     const player = players.find((player) => player._id === id);
 
     if(!player) {

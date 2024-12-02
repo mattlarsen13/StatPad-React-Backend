@@ -124,6 +124,33 @@ app.delete("/api/players/:id", (req, res)=> {
     res.status(200).send(player);
 });
 
+app.put("/api/players/:id", upload.single("img"), (req,res)=>{
+    const playerId = req.params.id;
+    const player = players.find((player)=>player._id == playerId);
+  
+    if(!player){
+      res.status(404).send("The player with the provided id was not found");
+      return;
+    }
+  
+    const result = validatePlayer(req.body);
+  
+    if(result.error){
+      res.status(400).send(result.error.details[0].message);
+      return;
+    }
+  
+    player.name = req.body.name;
+    player.description = req.body.description;
+    player.imagelink = req.body.imagelink;
+  
+    if(req.file){
+        player.image = "images/" + req.file.filename;
+    }
+     
+    res.status(200).send(player);
+});
+
 const validatePlayer = (players) => {
     const schema = Joi.object({
         _id: Joi.allow(""),

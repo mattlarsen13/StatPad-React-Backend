@@ -5,6 +5,8 @@ app.use(cors());
 app.use(express.static("public"));
 const Joi = require('joi');
 const multer = require('multer');
+const mongoose = require("mongoose");
+const { ServerMonitoringMode } = require("mongodb");
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -17,7 +19,26 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+mongoose
+  .connect(
+    "mongodb+srv://mattlarsen13:baseballsoccer@cluster0.ewguw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  )
+  .then(() => {
+    console.log("Succesfully connected to mongodb");
+  })
+  .catch((error) => {
+    console.log("Couldn't connect to mongodb", error);
+});
 
+const playerSchema = new mongoose.Schema({
+    name: String,
+    image: String,
+    imagelink: String,
+    description: String,
+});
+
+const Player = mongoose.model("Player", playerSchema);
+/*
 const players = [
     {
         "_id": 1,
@@ -75,19 +96,25 @@ const players = [
         "imagelink": "https://www.youtube.com/watch?v=mkhmBuQAud0",
         "description": "Lamar Jackson is a dynamic quarterback for the Baltimore Ravens, celebrated for his dual-threat abilities. In the 2023 season, Jackson threw for 3,678 yards with a 67.2% completion rate, 24 touchdowns, and just 7 interceptions across 16 games. His performance earned him his second MVP award, as he showcased both his passing efficiency and his explosive running skills. Jackson also had a passer rating of 102.7, solidifying his position as one of the most dangerous offensive players in the NFL, capable of changing the course of a game both through the air and on the ground."
     }
-];
+]; */
 
 app.get("/",(req, res)=>{
     console.log("getting me");
     res.sendFile(__dirname + "/index.html");
 });
 
-app.get("/api/players", (req, res)=>{
-    res.json(players);
+app.get("/api/players", async (req, res) => {
+    const players = await Player.find();
+    res.send(players);
+  });
+  
+app.get("/api/players/:id", async (req, res) => {
+    const player = await Player.findOne({ _id: id });
+    res.send(player);
 });
 
 
-app.post("/api/players", upload.single("img"), (req, res) => {
+app.post("/api/players", upload.single("img"), async(req, res) => {
     const result = validatePlayer(req.body);
 
     if (result.error) {
@@ -95,60 +122,49 @@ app.post("/api/players", upload.single("img"), (req, res) => {
         return;
     }
 
-    const player = {
+    const player = new Player({
         _id: players.length +1,
         name: req.body.name,
         imagelink: req.body.imagelink,
         description: req.body.description,
-    };
+    });
 
     if (req.file) {
         player.image = "images/" + req.file.filename;
     }
 
-    players.push(player);
+    const newPlayer = await player.save();
     res.status(200).send(player);
 });
 
-app.delete("/api/players/:id", (req, res)=> {
-    const id = parseInt(req.params.id);
-    const player = players.find((player) => player._id === id);
-
-    if(!player) {
-        res.status(404).send("The player with provided ID was not found.");
-        return;
-    }
-
-    const index = players.indexOf(player);
-    players.splice(index,1);
-    res.status(200).send(player);
+app.delete("/api/players/:id", async(req, res)=> {
+    const player = await Player.findByIdAndDelete(req.params.id);
+    res.send(player);
 });
 
-app.put("/api/players/:id", upload.single("img"), (req,res)=>{
-    const playerId = req.params.id;
-    const player = players.find((player)=>player._id == playerId);
-  
-    if(!player){
-      res.status(404).send("The player with the provided id was not found");
-      return;
-    }
-  
+app.put("/api/players/:id", upload.single("img"), async (req,res)=>{
     const result = validatePlayer(req.body);
-  
     if(result.error){
       res.status(400).send(result.error.details[0].message);
       return;
     }
-  
-    player.name = req.body.name;
-    player.description = req.body.description;
-    player.imagelink = req.body.imagelink;
+    let fieldsToUpdate = {
+        name: req.body.name,
+        imagelink: req.body.imagelink,
+        description: req.body.description,
+    };
   
     if(req.file){
-        player.image = "images/" + req.file.filename;
+        fieldsToUpdate.image = "images/" + req.file.filename;
     }
      
-    res.status(200).send(player);
+    const wentThrough = await Player.updateOne(
+        { _id: req.params.id },
+        fieldsToUpdate
+      );
+    
+    const updatedPlayer = await Player.findOne({ _id: req.params.id });
+    res.send(updatedPlayer);
 });
 
 const validatePlayer = (players) => {

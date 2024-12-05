@@ -38,7 +38,7 @@ const playerSchema = new mongoose.Schema({
 });
 
 const Player = mongoose.model("Player", playerSchema);
-/*
+
 const players = [
     {
         "_id": 1,
@@ -96,7 +96,7 @@ const players = [
         "imagelink": "https://www.youtube.com/watch?v=mkhmBuQAud0",
         "description": "Lamar Jackson is a dynamic quarterback for the Baltimore Ravens, celebrated for his dual-threat abilities. In the 2023 season, Jackson threw for 3,678 yards with a 67.2% completion rate, 24 touchdowns, and just 7 interceptions across 16 games. His performance earned him his second MVP award, as he showcased both his passing efficiency and his explosive running skills. Jackson also had a passer rating of 102.7, solidifying his position as one of the most dangerous offensive players in the NFL, capable of changing the course of a game both through the air and on the ground."
     }
-]; */
+]; 
 
 app.get("/",(req, res)=>{
     console.log("getting me");

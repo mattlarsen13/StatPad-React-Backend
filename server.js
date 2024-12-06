@@ -144,34 +144,10 @@ app.delete("/api/players/:id", async(req, res)=> {
     res.send(player);
 });
 
-/*app.put("/api/players/:id", upload.single("img"), async (req,res)=>{
-    const result = validatePlayer(req.body);
-    if(result.error){
-      res.status(400).send(result.error.details[0].message);
-      return;
-    }
-    let fieldsToUpdate = {
-        name: req.body.name,
-        imagelink: req.body.imagelink,
-        description: req.body.description,
-    };
-  
-    if(req.file){
-        fieldsToUpdate.image = "images/" + req.file.filename;
-    }
-     
-    const wentThrough = await Player.updateOne(
-        { _id: req.params.id },
-        fieldsToUpdate
-      );
-    
-    const updatedPlayer = await Player.findOne({ _id: req.params.id });
-    res.send(updatedPlayer);
-});*/
 app.put("/api/players/:id", upload.single("image"), async (req, res) => {
     try {
         const { name, imagelink, description } = req.body;
-        const image = req.file ? `/images/${req.file.filename}` : null; // Use new or existing image
+        const image = req.file ? `/images/${req.file.filename}` : null; 
 
         const updatedPlayer = await Player.findByIdAndUpdate(
             req.params.id,

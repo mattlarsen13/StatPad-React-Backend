@@ -1,13 +1,13 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
+const Joi = require("joi");
+const multer = require("multer");
+app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
+app.use(express.json());
+const cors = require("cors");
 app.use(cors());
-app.use(express.static("public")); 
-
-const Joi = require('joi');
-const multer = require('multer');
 const mongoose = require("mongoose");
-const { ServerMonitoringMode } = require("mongodb");
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {

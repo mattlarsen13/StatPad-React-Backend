@@ -144,7 +144,7 @@ app.delete("/api/players/:id", async(req, res)=> {
     res.send(player);
 });
 
-app.put("/api/players/:id", upload.single("img"), async (req,res)=>{
+/*app.put("/api/players/:id", upload.single("img"), async (req,res)=>{
     const result = validatePlayer(req.body);
     if(result.error){
       res.status(400).send(result.error.details[0].message);
@@ -167,7 +167,33 @@ app.put("/api/players/:id", upload.single("img"), async (req,res)=>{
     
     const updatedPlayer = await Player.findOne({ _id: req.params.id });
     res.send(updatedPlayer);
+});*/
+app.put("/api/players/:id", upload.single("image"), async (req, res) => {
+    try {
+        const { name, imagelink, description } = req.body;
+        const image = req.file ? `/images/${req.file.filename}` : null; // Use new or existing image
+
+        const updatedPlayer = await Player.findByIdAndUpdate(
+            req.params.id,
+            {
+                name,
+                imagelink,
+                description,
+                ...(image && { image }), // Add image only if it's updated
+            },
+            { new: true }
+        );
+
+        if (!updatedPlayer) {
+            return res.status(404).send("Player not found");
+        }
+        res.send(updatedPlayer);
+    } catch (error) {
+        console.error("Error updating player:", error);
+        res.status(400).send("Invalid request");
+    }
 });
+
 
 const validatePlayer = (players) => {
     const schema = Joi.object({

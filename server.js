@@ -169,14 +169,14 @@ app.put("/api/players/:id", upload.single("img"), async (req,res)=>{
     res.send(updatedPlayer);
 });
 
-const validatePlayer = (players) => {
+const validatePlayer = (player) => {
     const schema = Joi.object({
         _id: Joi.allow(""),
         name: Joi.string().min(3).required(),
         imagelink: Joi.string().min(3).required(),
         description: Joi.string().min(3).required(),
     });
-    return schema.validate(players);
+    return schema.validate(player);
 };
 
 app.listen(3001, () => {

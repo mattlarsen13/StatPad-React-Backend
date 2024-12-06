@@ -6,8 +6,15 @@ app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 app.use(express.json());
 const cors = require("cors");
-app.use(cors());
+//app.use(cors());
 const mongoose = require("mongoose");
+
+const corsOptions = {
+    origin: 'https://statpad-react.onrender.com', // Specify your frontend's exact URL
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  };
+  
+app.use(cors(corsOptions));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
